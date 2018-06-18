@@ -8,9 +8,9 @@ describe("module Game", () =>
       createPlayingBoard(~height=3, ~width=2)
       |> expect
       |> toEqual([|
-           [|"field", "field"|],
-           [|"field", "field"|],
-           [|"field", "field"|],
+           [|Sand, Sand|],
+           [|Sand, Sand|],
+           [|Sand, Sand|],
          |])
     )
   )

@@ -1,14 +1,23 @@
 type env =
   | Sand
-  | Spice
-  | HighSpice
+  | Ore
+  | HighOre
   | Rocks
   | Mountains;
 
 let createPlayingBoard = (~height, ~width) =>
-  Array.make_matrix(height, width, "field");
+  Array.make_matrix(height, width, Sand);
 
 let playingBoard = createPlayingBoard(~height=40, ~width=40);
+
+let getEnvClass = env =>
+  switch (env) {
+  | Sand => "sand"
+  | Ore => "ore"
+  | HighOre => "highOre"
+  | Rocks => "rocks"
+  | Mountains => "mountains"
+  };
 
 let component = ReasonReact.statelessComponent("Game");
 let make = _children => {
@@ -20,12 +29,15 @@ let make = _children => {
           ReasonReact.array(
             Array.mapi(
               (i, row) =>
-                <div key=(string_of_int(i)) className="field">
+                <div key=(string_of_int(i)) className="row">
                   (
                     ReasonReact.array(
                       Array.mapi(
-                        (ind, _field) =>
-                          <div key=(string_of_int(ind)) className="field" />,
+                        (ind, env) =>
+                          <div
+                            key=(string_of_int(ind))
+                            className=((env |> getEnvClass) ++ " field")
+                          />,
                         row,
                       ),
                     )
