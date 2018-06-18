@@ -5,10 +5,10 @@ type env =
   | Rocks
   | Mountains;
 
-let createPlayingBoard = (width, height) =>
+let createPlayingBoard = (~height, ~width) =>
   Array.make_matrix(height, width, "field");
 
-let playingBoard = createPlayingBoard(40, 40);
+let playingBoard = createPlayingBoard(~height=40, ~width=40);
 
 let component = ReasonReact.statelessComponent("Game");
 let make = _children => {
@@ -18,12 +18,16 @@ let make = _children => {
       <div className="game">
         (
           ReasonReact.array(
-            Array.map(
-              row =>
-                <div className="field">
+            Array.mapi(
+              (i, row) =>
+                <div key=(string_of_int(i)) className="field">
                   (
                     ReasonReact.array(
-                      Array.map(_field => <div className="field" />, row),
+                      Array.mapi(
+                        (ind, _field) =>
+                          <div key=(string_of_int(ind)) className="field" />,
+                        row,
+                      ),
                     )
                   )
                 </div>,
