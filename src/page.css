@@ -1,0 +1,11 @@
+.game {
+  display: flex;
+  flex-direction: row;
+}
+
+.field {
+  background: #c2b280;
+  height: 100px;
+  width: 60px;
+  border: 1px solid #999;
+}
