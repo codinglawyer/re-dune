@@ -10,7 +10,7 @@ let createPlayingBoard = (width, height) =>
 
 let playingBoard = createPlayingBoard(40, 40);
 
-let component = ReasonReact.statelessComponent("Page");
+let component = ReasonReact.statelessComponent("Game");
 let make = _children => {
   ...component,
   render: _self =>

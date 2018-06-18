@@ -1,6 +1,6 @@
 open Jest;
 open Expect;
-open Page;
+open Game;
 
 describe("re-dune", () =>
   test("create playing board of 2", () =>

@@ -1,3 +1,3 @@
-[%bs.raw {|require('./page.css')|}];
+[%bs.raw {|require('./game.css')|}];
 
-ReactDOMRe.renderToElementWithId(<Page />, "index");
+ReactDOMRe.renderToElementWithId(<Game />, "index");
