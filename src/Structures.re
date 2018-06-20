@@ -25,8 +25,8 @@ type layout = (int, int);
 
 type structure = {
   kind: structureKind,
-  coordinates: coordinates,
-  layout: layout,
+  coordinates,
+  layout,
   buildCost: int,
   buildTime: int,
   buildComplete: bool,
@@ -57,4 +57,7 @@ let smallConcreteSlab = {
   ===============================================
   */
 
-let buildTick = structure => { ...structure, buildProgress: structure.buildProgress + 1 };
+let buildTick = structure => {
+  ...structure,
+  buildProgress: structure.buildProgress + 1,
+};
