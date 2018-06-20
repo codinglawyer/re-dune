@@ -61,3 +61,8 @@ let buildTick = structure => {
   ...structure,
   buildProgress: structure.buildProgress + 1,
 };
+
+let buildCompleteTick = structure => {
+  ...structure,
+  buildComplete: structure.buildProgress >= structure.buildTime,
+};
