@@ -3,23 +3,75 @@ type env =
   | Ore
   | HighOre
   | Rocks
-  | Mountains;
+  | Mountains
+  | Empty;
 
-let getEnv = num =>
+type playingBoard = array(array(env));
+
+let addRocksSand = (num: int) =>
   switch (num) {
-  | 1 => Sand
-  | 2 => Rocks
-  | _ => Mountains
+  | 1 => Rocks
+  | _ => Sand
   };
 
-let createBoard = (~height, ~width) =>
-  Array.make_matrix(height, width, Sand);
 
-let randomizeBoard = board =>
-  Array.map(row => Array.map(_field => getEnv(Random.int(4)), row), board);
 
-let playingBoard =
-  createBoard(~height=40, ~width=40) |> randomizeBoard;
+let createBoard = (~width: int, ~height: int) =>
+  Array.make_matrix(width, height, Sand);
+
+let randomizeBoard = (board: playingBoard) =>
+  Array.mapi(
+    (x, row) => Array.mapi((y, _field) => addRocksSand(Random.int(3)), row),
+    board,
+  );
+
+let playingBoard = createBoard(~width=20, ~height=15) |> randomizeBoard;
+
+
+let getField = ((y: int, x: int), board: playingBoard) =>
+  switch (y, x) {
+  | _ when y < 0 || y >= Array.length(board) => Sand
+  | _ when x < 0 || x >= Array.length(board[0]) => Sand
+  | _ => board[y][x]
+  };
+
+let gett = ((x, y), board, field) =>
+  List.fold_left(
+    (sum, (diffX, diffY)) => {
+      let neighbourY = y + diffY;
+      let neighbourX = x + diffX;
+      let field = getField((neighbourX, neighbourY), board);
+      switch (field){
+      | Sand => sum
+      | Rocks => sum + 1
+      };
+    },
+    0,
+    [
+      ((-1), (-1)),
+      ((-1), 0),
+      ((-1), 1),
+      (0, (-1)),
+      (0, 1),
+      (1, (-1)),
+      (1, 0),
+      (1, 1),
+    ],
+  );
+
+   let someBoard =
+   Array.mapi(
+     (x, row) => Array.mapi((y, field) => {
+       let neighbours = gett((x,y), playingBoard, field);
+       switch(neighbours){
+       | _ when neighbours < 2 => Sand
+       | _ when neighbours < 4 => field
+       | _ => Rocks
+       }
+      }, row),
+     playingBoard,
+   );
+
 
 let getEnvClass = env =>
   switch (env) {
@@ -54,7 +106,7 @@ let make = _children => {
                     )
                   )
                 </div>,
-              playingBoard,
+               someBoard,
             ),
           )
         )
