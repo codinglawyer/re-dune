@@ -6,21 +6,22 @@ type env =
   | Mountains
   | Empty;
 
-let getEnvClass = env =>
+let getEnvClass = (env: env) =>
   switch (env) {
   | Sand => "sand"
   | Ore => "ore"
   | HighOre => "highOre"
   | Rocks => "rocks"
   | Mountains => "mountains"
+  | Empty => ""
   };
 
 type playingBoard = array(array(env));
 
-let addRocks = (num: int, _field) =>
+let addRocks = (num: int, field) =>
   switch (num) {
   | 1 => Rocks
-  | _ => Sand
+  | _ => field
   };
 
 let addOre = (num: int, field) =>
@@ -28,7 +29,7 @@ let addOre = (num: int, field) =>
   | Sand =>
     switch (num) {
     | 1 => Ore
-    | _ => Sand
+    | _ => field
     }
   | _ => field
   };
@@ -49,17 +50,7 @@ let getFieldType = ((y: int, x: int), board: playingBoard) =>
   | _ => board[y][x]
   };
 
-let countNearbyRocks = (sum, field) =>
-  switch (field) {
-  | Sand => sum
-  | Rocks => sum + 1
-  };
-
-let countNearbyOre = (sum, field) =>
-  switch (field) {
-  | Ore => sum + 1
-  | _ => sum
-  };
+let countNearbyEnvs = (env, sum, field) => env === field ? sum + 1 : sum;
 
 let countNeighbours = ((x, y), board, countFn, getFieldFn) =>
   List.fold_left(
@@ -82,13 +73,18 @@ let countNeighbours = ((x, y), board, countFn, getFieldFn) =>
     ],
   );
 
-let rockBoard = board =>
+let combineRocks = board =>
   Array.mapi(
     (x, row) =>
       Array.mapi(
         (y, field) => {
           let neighbours =
-            countNeighbours((x, y), board, countNearbyRocks, getFieldType);
+            countNeighbours(
+              (x, y),
+              board,
+              countNearbyEnvs(Rocks),
+              getFieldType,
+            );
           switch (neighbours) {
           | _ when neighbours < 2 => Sand
           | _ when neighbours < 4 => field
@@ -100,14 +96,62 @@ let rockBoard = board =>
     board,
   );
 
+let combineOre = board =>
+  Array.mapi(
+    (x, row) =>
+      Array.mapi(
+        (y, field) =>
+          switch (field) {
+          | Ore =>
+            let neighbours =
+              countNeighbours(
+                (x, y),
+                board,
+                countNearbyEnvs(Ore),
+                getFieldType,
+              );
+            switch (neighbours) {
+            | 1 => Rocks
+            | _ => Ore
+            };
+          | Sand =>
+            let neighbours =
+              countNeighbours(
+                (x, y),
+                board,
+                countNearbyEnvs(Sand),
+                getFieldType,
+              );
+            switch (neighbours) {
+            | 3 => Ore
+            | 4 => Ore
+            | _ => Sand
+            };
+          | Rocks =>
+            let neighbours =
+              countNeighbours(
+                (x, y),
+                board,
+                countNearbyEnvs(Rocks),
+                getFieldType,
+              );
+            switch (neighbours) {
+            | 3 => Ore
+            | _ => Rocks
+            };
+          | _ => Empty
+          },
+        row,
+      ),
+    board,
+  );
+
 let playingBoard =
-  createSandBoard(~width=20, ~height=15) |> randomizeBoard(addRocks);
-
-let rocksBoard = rockBoard(playingBoard);
-
-let ores = (board: playingBoard) => randomizeBoard(addOre, board);
-
-let mapWithOre = ores(rocksBoard);
+  createSandBoard(~width=20, ~height=15)
+  |> randomizeBoard(addRocks)
+  |> combineRocks
+  |> randomizeBoard(addOre)
+  |> combineOre;
 
 let component = ReasonReact.statelessComponent("Game");
 let make = _children => {
@@ -133,7 +177,7 @@ let make = _children => {
                     )
                   )
                 </div>,
-              mapWithOre,
+              playingBoard,
             ),
           )
         )
