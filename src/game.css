@@ -10,17 +10,21 @@
 }
 
 .sand {
-  background: #c2b280;
+  background: #b17435;
 }
 
 .rocks {
- background: #302f2e;
+  background: #484631;
 }
 
-.mountains {
- background: #5c3838;
+.hills {
+  background: #482c07;
 }
 
-.ore {
-  background: #d3a006;
+.spice {
+  background: #ae581d;
+}
+
+.spiceDunes {
+  background: #a64919;
 }

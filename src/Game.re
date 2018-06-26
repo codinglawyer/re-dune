@@ -1,18 +1,20 @@
 type env =
   | Sand
-  | Ore
-  | HighOre
+  | Spice
+  | SpiceDunes
   | Rocks
-  | Mountains
+  | Hills
+  | SpiceBloom
   | Empty;
 
 let getEnvClass = (env: env) =>
   switch (env) {
   | Sand => "sand"
-  | Ore => "ore"
-  | HighOre => "highOre"
+  | Spice => "spice"
+  | SpiceDunes => "spiceDunes"
   | Rocks => "rocks"
-  | Mountains => "mountains"
+  | Hills => "hills"
+  | SpiceBloom => "spiceBloom"
   | Empty => ""
   };
 
@@ -24,11 +26,21 @@ let addRocks = (num: int, field) =>
   | _ => field
   };
 
-let addOre = (num: int, field) =>
+let addSpice = (num: int, field) =>
   switch (field) {
   | Sand =>
     switch (num) {
-    | 1 => Ore
+    | 1 => Spice
+    | _ => field
+    }
+  | _ => field
+  };
+
+let addHills = (num: int, field) =>
+  switch (field) {
+  | Rocks =>
+    switch (num) {
+    | 1 => Hills
     | _ => field
     }
   | _ => field
@@ -37,9 +49,9 @@ let addOre = (num: int, field) =>
 let createSandBoard = (~width: int, ~height: int) =>
   Array.make_matrix(width, height, Sand);
 
-let randomizeBoard = (fn, board: playingBoard) =>
+let randomizeBoard = (fn, seed, board: playingBoard) =>
   Array.map(
-    row => Array.map(field => fn(Random.int(3), field), row),
+    row => Array.map(field => fn(Random.int(seed), field), row),
     board,
   );
 
@@ -96,23 +108,23 @@ let combineRocks = board =>
     board,
   );
 
-let combineOre = board =>
+let combineSpice = board =>
   Array.mapi(
     (x, row) =>
       Array.mapi(
         (y, field) =>
           switch (field) {
-          | Ore =>
+          | Spice =>
             let neighbours =
               countNeighbours(
                 (x, y),
                 board,
-                countNearbyEnvs(Ore),
+                countNearbyEnvs(Spice),
                 getFieldType,
               );
             switch (neighbours) {
             | 1 => Rocks
-            | _ => Ore
+            | _ => Spice
             };
           | Sand =>
             let neighbours =
@@ -123,8 +135,8 @@ let combineOre = board =>
                 getFieldType,
               );
             switch (neighbours) {
-            | 3 => Ore
-            | 4 => Ore
+            | 3 => Spice
+            | 4 => Spice
             | _ => Sand
             };
           | Rocks =>
@@ -136,7 +148,7 @@ let combineOre = board =>
                 getFieldType,
               );
             switch (neighbours) {
-            | 3 => Ore
+            | 3 => Spice
             | _ => Rocks
             };
           | _ => Empty
@@ -148,10 +160,11 @@ let combineOre = board =>
 
 let playingBoard =
   createSandBoard(~width=20, ~height=15)
-  |> randomizeBoard(addRocks)
+  |> randomizeBoard(addRocks, 3)
   |> combineRocks
-  |> randomizeBoard(addOre)
-  |> combineOre;
+  |> randomizeBoard(addSpice, 3)
+  |> combineSpice
+  |> randomizeBoard(addHills, 6);
 
 let component = ReasonReact.statelessComponent("Game");
 let make = _children => {
