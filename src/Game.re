@@ -57,8 +57,8 @@ let randomizeBoard = (fn, seed, board: playingBoard) =>
 
 let getFieldType = ((y: int, x: int), board: playingBoard) =>
   switch (y, x) {
-  | _ when y < 0 || y >= Array.length(board) => Sand
-  | _ when x < 0 || x >= Array.length(board[0]) => Sand
+  | _ when y < 0 || y >= Array.length(board) => Empty
+  | _ when x < 0 || x >= Array.length(board[0]) => Empty
   | _ => board[y][x]
   };
 
