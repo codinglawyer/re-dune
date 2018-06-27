@@ -1,9 +1,9 @@
 type env =
   | Sand
   | Spice
-  | SpiceDunes
-  | Rocks
-  | Hills
+  | SpiceDune
+  | Rock
+  | Hill
   | SpiceBloom
   | Empty;
 
@@ -11,18 +11,18 @@ let getEnvClass = (env: env) =>
   switch (env) {
   | Sand => "sand"
   | Spice => "spice"
-  | SpiceDunes => "spiceDunes"
-  | Rocks => "rocks"
-  | Hills => "hills"
+  | SpiceDune => "spiceDune"
+  | Rock => "rock"
+  | Hill => "hill"
   | SpiceBloom => "spiceBloom"
   | Empty => ""
   };
 
 type playingBoard = array(array(env));
 
-let addRocks = (num: int, field) =>
+let addRock = (num: int, field) =>
   switch (num) {
-  | 1 => Rocks
+  | 1 => Rock
   | _ => field
   };
 
@@ -36,11 +36,11 @@ let addSpice = (num: int, field) =>
   | _ => field
   };
 
-let addHills = (num: int, field) =>
+let addHill = (num: int, field) =>
   switch (field) {
-  | Rocks =>
+  | Rock =>
     switch (num) {
-    | 1 => Hills
+    | 1 => Hill
     | _ => field
     }
   | _ => field
@@ -85,7 +85,7 @@ let countNeighbours = ((x, y), board, countFn, getFieldFn) =>
     ],
   );
 
-let combineRocks = board =>
+let combineRock = board =>
   Array.mapi(
     (x, row) =>
       Array.mapi(
@@ -94,13 +94,13 @@ let combineRocks = board =>
             countNeighbours(
               (x, y),
               board,
-              countNearbyEnvs(Rocks),
+              countNearbyEnvs(Rock),
               getFieldType,
             );
           switch (neighbours) {
           | _ when neighbours < 2 => Sand
           | _ when neighbours < 4 => field
-          | _ => Rocks
+          | _ => Rock
           };
         },
         row,
@@ -123,7 +123,7 @@ let combineSpice = board =>
                 getFieldType,
               );
             switch (neighbours) {
-            | 1 => Rocks
+            | 1 => Rock
             | _ => Spice
             };
           | Sand =>
@@ -139,17 +139,17 @@ let combineSpice = board =>
             | 4 => Spice
             | _ => Sand
             };
-          | Rocks =>
+          | Rock =>
             let neighbours =
               countNeighbours(
                 (x, y),
                 board,
-                countNearbyEnvs(Rocks),
+                countNearbyEnvs(Rock),
                 getFieldType,
               );
             switch (neighbours) {
             | 3 => Spice
-            | _ => Rocks
+            | _ => Rock
             };
           | _ => Empty
           },
@@ -160,11 +160,11 @@ let combineSpice = board =>
 
 let playingBoard =
   createSandBoard(~width=20, ~height=15)
-  |> randomizeBoard(addRocks, 3)
-  |> combineRocks
+  |> randomizeBoard(addRock, 3)
+  |> combineRock
   |> randomizeBoard(addSpice, 3)
   |> combineSpice
-  |> randomizeBoard(addHills, 6);
+  |> randomizeBoard(addHill, 6);
 
 let component = ReasonReact.statelessComponent("Game");
 let make = _children => {
