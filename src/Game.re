@@ -7,6 +7,8 @@ type env =
   | SpiceBloom
   | Empty;
 
+type playingBoard = array(array(env));
+
 let getEnvClass = (env: env) =>
   switch (env) {
   | Sand => "sand"
@@ -17,8 +19,6 @@ let getEnvClass = (env: env) =>
   | SpiceBloom => "spiceBloom"
   | Empty => ""
   };
-
-type playingBoard = array(array(env));
 
 let addRock = (num: int, field) =>
   switch (num) {
