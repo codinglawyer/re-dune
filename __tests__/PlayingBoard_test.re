@@ -1,6 +1,7 @@
 open Jest;
 open Expect;
 open PlayingBoard;
+open SharedTypes;
 
 describe("module Game", () => {
   describe("method createSandBoard", () =>

@@ -1,26 +1,7 @@
 [%bs.raw {|require('./playingBoard.css')|}];
-
-type env =
-  | Sand
-  | Spice
-  | SpiceDune
-  | Rock
-  | Hill
-  | SpiceBloom
-  | Empty;
+open SharedTypes;
 
 type playingBoard = array(array(env));
-
-let getEnvClass = (env: env) =>
-  switch (env) {
-  | Sand => "sand"
-  | Spice => "spice"
-  | SpiceDune => "spiceDune"
-  | Rock => "rock"
-  | Hill => "hill"
-  | SpiceBloom => "spiceBloom"
-  | Empty => ""
-  };
 
 let addRock = (num: int, field: env) =>
   switch (num) {
@@ -165,26 +146,9 @@ let make = _children => {
     <div>
       <div className="game">
         (
-          ReasonReact.array(
-            Array.mapi(
-              (i, row) =>
-                <div key=(string_of_int(i)) className="row">
-                  (
-                    ReasonReact.array(
-                      Array.mapi(
-                        (ind, env) =>
-                          <div
-                            key=(string_of_int(ind))
-                            className=((env |> getEnvClass) ++ " field")
-                          />,
-                        row,
-                      ),
-                    )
-                  )
-                </div>,
-              playingBoard,
-            ),
-          )
+          playingBoard
+          |> Array.mapi((i, row) => <Field key=(string_of_int(i)) row />)
+          |> ReasonReact.array
         )
       </div>
     </div>,
