@@ -46,7 +46,7 @@ let addHill = (num: int, field) =>
   | _ => field
   };
 
-let createSandBoard = (~width: int, ~height: int) =>
+let createSandBoard = ((width: int, height: int)) =>
   Array.make_matrix(width, height, Sand);
 
 let randomizeBoard = (fn, seed, board: playingBoard) =>
@@ -62,9 +62,9 @@ let getFieldType = ((y: int, x: int), board: playingBoard) =>
   | _ => board[y][x]
   };
 
-let countNearbyEnvs = (env, sum, field) => env === field ? sum + 1 : sum;
+let compute = (env, sum, field) => env === field ? sum + 1 : sum;
 
-let countNeighbours = ((x, y), board, countFn, getFieldFn) =>
+let countNeighbours = ((x, y), getFieldFn, board, countFn) =>
   List.fold_left(
     (sum, (diffX, diffY)) => {
       let neighbourY = y + diffY;
@@ -85,18 +85,13 @@ let countNeighbours = ((x, y), board, countFn, getFieldFn) =>
     ],
   );
 
-let combineRock = board =>
+let combineRocks = board =>
   Array.mapi(
     (x, row) =>
       Array.mapi(
         (y, field) => {
           let neighbours =
-            countNeighbours(
-              (x, y),
-              board,
-              countNearbyEnvs(Rock),
-              getFieldType,
-            );
+            countNeighbours((x, y), getFieldType, board, compute(Rock));
           switch (neighbours) {
           | _ when neighbours < 2 => Sand
           | _ when neighbours < 4 => field
@@ -112,59 +107,47 @@ let combineSpice = board =>
   Array.mapi(
     (x, row) =>
       Array.mapi(
-        (y, field) =>
+        (y, field) => {
+          let curriedCountNeighbours =
+            countNeighbours((x, y), getFieldType, board);
           switch (field) {
           | Spice =>
-            let neighbours =
-              countNeighbours(
-                (x, y),
-                board,
-                countNearbyEnvs(Spice),
-                getFieldType,
-              );
+            let neighbours = curriedCountNeighbours(compute(Spice));
             switch (neighbours) {
             | 1 => Rock
             | _ => Spice
             };
           | Sand =>
-            let neighbours =
-              countNeighbours(
-                (x, y),
-                board,
-                countNearbyEnvs(Sand),
-                getFieldType,
-              );
+            let neighbours = curriedCountNeighbours(compute(Sand));
             switch (neighbours) {
             | 3 => Spice
             | 4 => Spice
             | _ => Sand
             };
           | Rock =>
-            let neighbours =
-              countNeighbours(
-                (x, y),
-                board,
-                countNearbyEnvs(Rock),
-                getFieldType,
-              );
+            let neighbours = curriedCountNeighbours(compute(Rock));
             switch (neighbours) {
             | 3 => Spice
             | _ => Rock
             };
           | _ => Empty
-          },
+          };
+        },
         row,
       ),
     board,
   );
 
-let playingBoard =
-  createSandBoard(~width=20, ~height=15)
+let createPlayingBoard = (~width, ~height) =>
+  (width, height)
+  |> createSandBoard
   |> randomizeBoard(addRock, 3)
-  |> combineRock
+  |> combineRocks
   |> randomizeBoard(addSpice, 3)
   |> combineSpice
   |> randomizeBoard(addHill, 6);
+
+let playingBoard = createPlayingBoard(~width=20, ~height=15);
 
 let component = ReasonReact.statelessComponent("Game");
 let make = _children => {
