@@ -1,6 +1,6 @@
 open Jest;
 open Expect;
-open Game;
+open PlayingBoard;
 
 describe("module Game", () => {
   describe("method createSandBoard", () =>

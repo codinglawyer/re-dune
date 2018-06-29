@@ -1,3 +1,5 @@
+[%bs.raw {|require('./playingBoard.css')|}];
+
 type env =
   | Sand
   | Spice
@@ -20,13 +22,13 @@ let getEnvClass = (env: env) =>
   | Empty => ""
   };
 
-let addRock = (num: int, field) =>
+let addRock = (num: int, field: env) =>
   switch (num) {
   | 1 => Rock
   | _ => field
   };
 
-let addSpice = (num: int, field) =>
+let addSpice = (num: int, field: env) =>
   switch (field) {
   | Sand =>
     switch (num) {
@@ -36,7 +38,7 @@ let addSpice = (num: int, field) =>
   | _ => field
   };
 
-let addHill = (num: int, field) =>
+let addHill = (num: int, field: env) =>
   switch (field) {
   | Rock =>
     switch (num) {
@@ -49,7 +51,7 @@ let addHill = (num: int, field) =>
 let createSandBoard = ((width: int, height: int)) =>
   Array.make_matrix(width, height, Sand);
 
-let randomizeBoard = (fn, seed, board: playingBoard) =>
+let randomizeBoard = (fn: (int, env) => env, seed: int, board: playingBoard) =>
   Array.map(
     row => Array.map(field => fn(Random.int(seed), field), row),
     board,
@@ -62,9 +64,16 @@ let getFieldType = ((y: int, x: int), board: playingBoard) =>
   | _ => board[y][x]
   };
 
-let compute = (env, sum, field) => env === field ? sum + 1 : sum;
+let compute = (env: env, sum: int, field: env) =>
+  env === field ? sum + 1 : sum;
 
-let countNeighbours = ((x, y), getFieldFn, board, countFn) =>
+let countNeighbours =
+    (
+      (x, y),
+      getFieldFn: ((int, int), playingBoard) => env,
+      board,
+      countFn: (int, env) => int,
+    ) =>
   List.fold_left(
     (sum, (diffX, diffY)) => {
       let neighbourY = y + diffY;
@@ -85,7 +94,7 @@ let countNeighbours = ((x, y), getFieldFn, board, countFn) =>
     ],
   );
 
-let combineRocks = board =>
+let combineRocks = (board: playingBoard) =>
   Array.mapi(
     (x, row) =>
       Array.mapi(
@@ -103,7 +112,7 @@ let combineRocks = board =>
     board,
   );
 
-let combineSpice = board =>
+let combineSpice = (board: playingBoard) =>
   Array.mapi(
     (x, row) =>
       Array.mapi(
@@ -138,7 +147,7 @@ let combineSpice = board =>
     board,
   );
 
-let createPlayingBoard = (~width, ~height) =>
+let createPlayingBoard = (~width: int, ~height: int) =>
   (width, height)
   |> createSandBoard
   |> randomizeBoard(addRock, 3)
