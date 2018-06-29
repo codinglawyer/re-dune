@@ -5,12 +5,11 @@ open Game;
 describe("module Game", () => {
   describe("method createSandBoard", () =>
     test("will create 3x2 playing board", () =>
-      createSandBoard(~height=2, ~width=3)
+      createSandBoard((3, 2))
       |> expect
       |> toEqual([|[|Sand, Sand|], [|Sand, Sand|], [|Sand, Sand|]|])
     )
   );
-
   describe("method randomizeBoard", () => {
     test("will add Rocks to the board", () =>
       randomizeBoard(
@@ -61,6 +60,42 @@ describe("module Game", () => {
       )
       |> expect
       |> toEqual(Rock)
-    )
+    );
   });
+
+  describe("method countNeighbours", () =>
+    test(
+      "count how many neighbouring fields belongs to the same type as the original field",
+      () =>
+      countNeighbours(
+        (0, 0),
+        getFieldType,
+        [|[|Rock, Rock|], [|Spice, Sand|], [|Sand, Sand|]|],
+        compute(Rock),
+      )
+      |> expect
+      |> toEqual(1)
+    )
+  );
+  describe("method combineRocks", () =>
+    test("combines Rocks env fields on the board to bigger units", () =>
+      combineRocks([|[|Rock, Rock|], [|Sand, Rock|], [|Rock, Rock|]|])
+      |> expect
+      |> toEqual([|[|Rock, Rock|], [|Rock, Rock|], [|Rock, Rock|]|])
+    )
+  );
+  describe("method combineSpice", () =>
+    test("combines Spice env fields on the board to bigger units", () =>
+      combineSpice([|[|Sand, Sand|], [|Sand, Sand|], [|Sand, Sand|]|])
+      |> expect
+      |> toEqual([|[|Spice, Spice|], [|Sand, Sand|], [|Spice, Spice|]|])
+    )
+  );
+  describe("method createPlayingBoard", () =>
+    test("will create 3x2 playing board", () =>
+      createPlayingBoard(~width=3, ~height=2)
+      |> expect
+      |> toEqual([|[|Sand, Spice|], [|Spice, Spice|], [|Sand, Spice|]|])
+    )
+  );
 });
