@@ -1,0 +1,30 @@
+.game {
+  display: flex;
+  flex-direction: row;
+}
+
+.field {
+  height: 50px;
+  width: 50px;
+  border: 1px solid #999;
+}
+
+.sand {
+  background: #b17435;
+}
+
+.rock {
+  background: #484631;
+}
+
+.hill {
+  background: #482c07;
+}
+
+.spice {
+  background: #ae581d;
+}
+
+.spiceDune {
+  background: #a64919;
+}
